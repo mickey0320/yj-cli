@@ -22,7 +22,7 @@ function cli() {
     checkUserHome();
     // checkInputArgs();
     checkEnv();
-    checkUpdate();
+    // checkUpdate();
     registerCommand();
   } catch (err) {
     log.error(err.message);
@@ -80,7 +80,17 @@ function checkEnv() {
 }
 
 async function checkUpdate() {
-  getNpmInfo(pkg.name);
+  const npmName = pkg.name;
+  const currentVersion = pkg.version;
+  const { getNpmSemverVersion } = require("@yj-cli/npm-get-info");
+  const newestVersion = await getNpmSemverVersion(currentVersion, npmName);
+  if (semver.gt(newestVersion, currentVersion)) {
+    log.warn(
+      colors.yellow(
+        `手动更新${npmName},当前版本${currentVersion},最新版本${newestVersion}`
+      )
+    );
+  }
 }
 
 function registerCommand() {
